@@ -16,6 +16,7 @@ export class Runner {
       progress: (text: string) => void,
     ) => Promise<Result>,
     private runTimeoutMs = DEFAULT_AGENT_RUN_TIMEOUT_MS,
+    private onSettled?: (claim: Claim, outcome: 'finished' | 'failed') => void,
   ) {}
   start() {
     if (!this.timer) {
@@ -100,11 +101,13 @@ export class Runner {
           );
       controller.signal.throwIfAborted();
       this.store.finish(claim, result);
+      this.onSettled?.(claim, 'finished');
     } catch (error) {
       this.store.fail(
         claim,
         error instanceof Error ? error.message : 'Unexpected research failure.',
       );
+      this.onSettled?.(claim, 'failed');
     } finally {
       clearInterval(ownershipCheck);
       clearTimeout(timeout);

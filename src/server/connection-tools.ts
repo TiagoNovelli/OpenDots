@@ -26,24 +26,30 @@ export function connectionTools(
       // Re-resolve so a tool the owner just disabled or gated is honored.
       const current = connections.resolve(dotId, exposed.name);
       const input = (args ?? {}) as Record<string, unknown>;
+      if (current.tool.requiresApproval && approvals) {
+        const approvalId = connections.store.createApproval({
+          threadId,
+          dotId,
+          connectionId: current.connection.id,
+          tool: current.tool.name,
+          arguments: input,
+        });
+        connections.onApprovalRequested?.(
+          dotId,
+          `${current.connection.name} · ${current.tool.title}`,
+        );
+        return {
+          status: 'approval_required',
+          approvalId,
+          instruction: `Call ${connectionActionTool.name} with this approvalId and a one-sentence summary of what it will do. Then wait for the owner.`,
+        };
+      }
       if (current.tool.requiresApproval)
-        return approvals
-          ? {
-              status: 'approval_required',
-              approvalId: connections.store.createApproval({
-                threadId,
-                dotId,
-                connectionId: current.connection.id,
-                tool: current.tool.name,
-                arguments: input,
-              }),
-              instruction: `Call ${connectionActionTool.name} with this approvalId and a one-sentence summary of what it will do. Then wait for the owner.`,
-            }
-          : {
-              status: 'unavailable',
-              message:
-                'This action needs owner approval in the OpenDots web app. Ask the owner to continue there.',
-            };
+        return {
+          status: 'unavailable',
+          message:
+            'This action needs owner approval in the OpenDots web app. Ask the owner to continue there.',
+        };
       const result = await connections.call(current, input, signal);
       check();
       return result;

@@ -106,6 +106,14 @@ Every provider is reached through its OpenAI-compatible Chat Completions API. Se
 
 Voice uses its own `VOICE_*` settings and is not affected by the model preset.
 
+## Phone app and notifications
+
+OpenDots is installable: on a phone, open it in the browser and add it to the Home Screen; it then opens without browser controls. On iPhone, notifications work only in the app opened from its Home Screen icon (iOS 16.4 or later).
+
+In **Settings → Phone notifications**, turn notifications on for each device. OpenDots then notifies that device when a scheduled task finishes or fails, and when a Dot waits for your approval of a connected-service action. Each device gets text in the language it used when it subscribed. **Send test** checks delivery.
+
+The server creates its VAPID keys on first start and keeps them in `DATABASE_PATH`; new keys would invalidate every subscription, so back up that file with the rest. `PUSH_SUBJECT` sets the contact sent to push services and defaults to the first `https` origin in `APP_ORIGIN`. Notifications need HTTPS outside `localhost`.
+
 ## Pages and page conversations
 
 Select a Space to open its page library. Search for a document, switch between grid and list views, or create a new page. The visual editor supports formatting, headings, lists, checklists, tables, and slash commands. Use `/` to insert a block and Cmd/Ctrl+S to save immediately. Pages autosave after editing pauses; the save status tells you whether changes reached the server.

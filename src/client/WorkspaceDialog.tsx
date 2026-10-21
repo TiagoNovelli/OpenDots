@@ -15,6 +15,7 @@ import {
   type LocalePreference,
 } from './i18n';
 import { limitSummary } from './model-limit';
+import { PushSettings } from './PushSettings';
 export type Dialog =
   | { type: 'space' }
   | { type: 'dot'; dot?: Dot; spaceId: string }
@@ -497,6 +498,7 @@ export function WorkspaceDialog({
               </p>
             </fieldset>
           )}
+          {dialog.type === 'settings' && <PushSettings />}
           {dialog.type === 'settings' && (
             <div className="config-note">
               <strong>{t('Service setup')}</strong>

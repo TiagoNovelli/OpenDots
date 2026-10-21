@@ -12,6 +12,13 @@ Ideias e melhorias planejadas para este fork do OpenDots.
 - [ ] **Canais Teams, WhatsApp e Telegram**: o projeto já tem os pacotes
       `@copilotkit/channels-teams`, `channels-whatsapp` e `channels-telegram`;
       hoje só o Slack está ligado.
+- [ ] **Provedor reserva**: quando um provedor recusar por limite (429), tentar um
+      segundo provedor configurado.
+- [ ] **Modelo por Dot**: cada Dot com seu provedor e modelo.
+- [ ] **Backup automático** do banco do OpenDots (Dots, páginas, chaves de push) para
+      fora da VPS.
+- [ ] **Notificar revisão de página pendente**: hoje só aprovações de ferramentas MCP
+      avisam no celular.
 - [ ] **Medir e reduzir o consumo de tokens**: quanto custa cada mensagem e quanto
       pesa cada ferramenta ligada, para decidir o que desligar por Dot.
 
@@ -52,3 +59,6 @@ Ideias e melhorias planejadas para este fork do OpenDots.
 - [x] Presets de provedor de modelo (`MODEL_PROVIDER`): openai, groq, anthropic, gemini,
       openrouter, deepseek, mistral, xai e ollama.
 - [x] Interface em português (pt-BR), com escolha de idioma nas configurações.
+- [x] Medidor dos limites do provedor de modelo e mensagem amigável ao atingir o limite.
+- [x] App instalável (PWA) com ícone do mascote.
+- [x] Notificações no celular: tarefa agendada concluída ou com falha, e aprovação pendente.

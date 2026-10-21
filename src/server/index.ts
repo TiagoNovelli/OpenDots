@@ -1,6 +1,7 @@
 import { webSearchProvider } from './parallel.js';
 import { modelConfigFromEnv, modelProvider } from './model-provider.js';
 import { ModelLimitTracker } from './model-limits.js';
+import { PushService } from './push.js';
 import { createShutdown } from './shutdown.js';
 import { reportChannelFailure, safeFailure } from './slack-channel.js';
 import { serve } from '@hono/node-server';
@@ -64,6 +65,22 @@ const config: PlatformConfig = {
   ownerToken,
 };
 const platform = new Platform(store, workspace, config);
+const appOrigins = resolveAppOrigins(
+  process.env.APP_ORIGIN,
+  process.env.NODE_ENV,
+);
+const push = new PushService(
+  database,
+  process.env.PUSH_SUBJECT ||
+    (appOrigins ?? []).find((origin) => origin.startsWith('https://')) ||
+    'mailto:opendots@localhost',
+);
+platform.connections.onApprovalRequested = (dotId, action) =>
+  void push.notify({
+    kind: 'approval_requested',
+    dot: workspace.dot(dotId)?.name ?? 'Dot',
+    action,
+  });
 const researchConfig = {
   mode: 'live' as const,
   apiKey: config.apiKey,
@@ -91,6 +108,11 @@ const runner = new Runner(
     return { text, sources: [], sample: false };
   },
   config.agentRunTimeoutMs,
+  (claim, outcome) =>
+    void push.notify({
+      kind: outcome === 'finished' ? 'task_finished' : 'task_failed',
+      prompt: claim.prompt,
+    }),
 );
 const wsOrigin = new URL(
   config.intelligenceWsUrl ?? 'wss://realtime.intelligence.copilotkit.ai',
@@ -100,8 +122,9 @@ const app = createApp({
   runner,
   config: researchConfig,
   ownerToken,
-  origin: resolveAppOrigins(process.env.APP_ORIGIN, process.env.NODE_ENV),
+  origin: appOrigins,
   platform,
+  push,
 });
 app.use('*', async (c, next) => {
   c.header('X-Content-Type-Options', 'nosniff');

@@ -144,6 +144,8 @@ const failure = (error: unknown) => {
   return `Could not reach the connected service${error.message ? `: ${error.message.slice(0, 200)}` : '.'}`;
 };
 export class ConnectionService {
+  /** Called when a gated tool waits for the owner, to notify their devices. */
+  onApprovalRequested?: (dotId: string, action: string) => void;
   constructor(
     readonly store: ConnectionStore,
     private transport: McpTransportFactory = httpTransport,

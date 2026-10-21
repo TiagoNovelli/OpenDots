@@ -9,6 +9,7 @@ import { Runner } from './runner.js';
 import { configured, type Config } from './research.js';
 import type { Platform } from './platform.js';
 import { VoiceService } from './voice.js';
+import { pushSubscriptionSchema, type PushService } from './push.js';
 import { workspaceRoutes } from './workspace-routes.js';
 const interval = z.number().int().min(60).max(31_536_000).nullable();
 export interface AppOptions {
@@ -18,6 +19,7 @@ export interface AppOptions {
   ownerToken?: string;
   origin?: string | string[];
   platform?: Platform;
+  push?: PushService;
 }
 export function createApp({
   store,
@@ -26,6 +28,7 @@ export function createApp({
   ownerToken,
   origin,
   platform,
+  push,
 }: AppOptions) {
   const app = new Hono();
   app.use(
@@ -108,6 +111,36 @@ export function createApp({
       modelLimits: config.modelLimits?.snapshot() ?? null,
     }),
   );
+  if (push) {
+    app.get('/api/push', (c) =>
+      c.json({ publicKey: push.publicKey(), devices: push.count() }),
+    );
+    app.post('/api/push/subscriptions', async (c) => {
+      const parsed = z
+        .object({
+          subscription: pushSubscriptionSchema,
+          locale: z.enum(['en', 'pt-BR']),
+        })
+        .safeParse(await c.req.json().catch(() => null));
+      if (!parsed.success)
+        return c.json({ error: 'Invalid push subscription.' }, 400);
+      push.subscribe(parsed.data.subscription, parsed.data.locale);
+      return c.json({ devices: push.count() });
+    });
+    app.delete('/api/push/subscriptions', async (c) => {
+      const parsed = z
+        .object({ endpoint: z.string().min(1).max(2048) })
+        .safeParse(await c.req.json().catch(() => null));
+      if (!parsed.success)
+        return c.json({ error: 'Invalid push subscription.' }, 400);
+      push.unsubscribe(parsed.data.endpoint);
+      return c.json({ devices: push.count() });
+    });
+    app.post('/api/push/test', async (c) => {
+      await push.notify({ kind: 'test' });
+      return c.json({ devices: push.count() });
+    });
+  }
   app.post('/api/tasks', async (c) => {
     const parsed = z
       .object({

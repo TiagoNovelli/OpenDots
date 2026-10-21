@@ -543,4 +543,20 @@ export const ptBR: Record<string, string> = {
   'Model limits ({provider}):': 'Limites do modelo ({provider}):',
   'Reported by the provider with each response; updated after the next message.':
     'Informado pelo provedor a cada resposta; atualiza depois da próxima mensagem.',
+  'Could not change notifications.':
+    'Não foi possível alterar as notificações.',
+  'Test sent. It should arrive in a few seconds.':
+    'Teste enviado. Deve chegar em alguns segundos.',
+  'Phone notifications': 'Notificações no celular',
+  'This browser cannot receive notifications. On iPhone, add OpenDots to the Home Screen and open it from there.':
+    'Este navegador não recebe notificações. No iPhone, adicione o OpenDots à Tela de Início e abra por lá.',
+  'Notifications are blocked for this site. Allow them in the browser settings, then reload.':
+    'As notificações estão bloqueadas para este site. Libere nas configurações do navegador e recarregue.',
+  'Notifications are on for this device.':
+    'Notificações ativadas neste aparelho.',
+  'Get notified when a scheduled task finishes or a Dot needs your approval.':
+    'Receba um aviso quando uma tarefa agendada terminar ou um Dot precisar da sua aprovação.',
+  'Turn on notifications': 'Ativar notificações',
+  'Send test': 'Enviar teste',
+  'Turn off': 'Desativar',
 };
