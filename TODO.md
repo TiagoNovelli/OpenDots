@@ -2,15 +2,6 @@
 
 Ideias e melhorias planejadas para este fork do OpenDots.
 
-## Em andamento
-
-- [ ] **Interface em português (i18n)**: traduzir a interface e permitir escolher o idioma.
-- [ ] **Presets de provedor de modelo**: Groq, OpenAI, Anthropic, OpenRouter e outros
-      compatíveis com a API da OpenAI, com a correção de schema da Groq aplicada só
-      onde é necessária.
-- [ ] **Armazenamento próprio das conversas**: deixar de depender do CopilotKit
-      Intelligence para guardar threads e mensagens.
-
 ## Próximas
 
 - [ ] **Pet de cada Dot**: escolher o bicho (gato, cachorro, coelho, raposa…) e o nome
@@ -38,6 +29,19 @@ Ideias e melhorias planejadas para este fork do OpenDots.
       repetitivo e revisar as skills propostas.
 - [ ] **Contribuir de volta para a CopilotKit**: correção de schema da Groq e correção
       dos headers que reconectavam o runtime a cada renderização.
+- [ ] **Armazenamento próprio das conversas (modo sem Intelligence)**: guardar threads e
+      mensagens no SQLite do próprio OpenDots, mantendo o Intelligence como opção.
+      O runtime já tem o encaixe: um `AgentRunner` com endpoints locais de threads
+      (o `InMemoryAgentRunner` faz isso, só que na memória). Decidimos não fazer agora
+      porque, sem o Intelligence, perdem-se recursos:
+  - **Automatic Learning**: o mais difícil de reconstruir com qualidade.
+  - **Slack gerenciado**: daria para refazer com um app próprio no Slack.
+  - **Tempo real entre abas e aparelhos**: a aba que pergunta continua recebendo
+    ao vivo (SSE); faltaria um canal de eventos do servidor.
+  - **Nomes automáticos das conversas**: fácil, uma chamada ao modelo.
+
+  Faz sentido quando privacidade ou independência pesarem mais, por exemplo no fork
+  da empresa.
 
 ## Feito
 
@@ -45,3 +49,6 @@ Ideias e melhorias planejadas para este fork do OpenDots.
 - [x] Correção: o app reconectava o runtime a cada renderização (403 repetidos).
 - [x] Deploy em https://dot.brainess.com.br com Traefik e HTTPS.
 - [x] Deploy automático: push no `main` → CI → deploy na VPS por chave SSH restrita.
+- [x] Presets de provedor de modelo (`MODEL_PROVIDER`): openai, groq, anthropic, gemini,
+      openrouter, deepseek, mistral, xai e ollama.
+- [x] Interface em português (pt-BR), com escolha de idioma nas configurações.

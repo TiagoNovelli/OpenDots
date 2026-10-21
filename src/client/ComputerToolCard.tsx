@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowUpRight, FileText, Monitor, Terminal } from 'lucide-react';
 import { z } from 'zod';
 import { api } from './api';
+import { t } from './i18n';
 
 const screenSchema = z.object({
   base64: z
@@ -120,8 +121,8 @@ export function ComputerToolCard({
             setScreen(undefined);
             setScreenError(
               cause instanceof Error
-                ? cause.message
-                : 'Computer preview unavailable.',
+                ? t(cause.message)
+                : t('Computer preview unavailable.'),
             );
           }
         }
@@ -144,18 +145,21 @@ export function ComputerToolCard({
   return (
     <section
       className={`inline-computer ${showScreen ? 'with-screen' : ''}`}
-      aria-label={`${dotName} computer: ${labels[action] ?? action}`}
+      aria-label={t('{name} computer: {action}', {
+        name: dotName,
+        action: labels[action] ? t(labels[action]) : action,
+      })}
     >
       <header>
         <Icon size={16} aria-hidden="true" />
-        <strong>{labels[action] ?? 'Using computer'}</strong>
+        <strong>{t(labels[action] ?? 'Using computer')}</strong>
         <span className={failed ? 'tool-state failed' : 'tool-state'}>
-          {state}
+          {t(state)}
         </span>
         {onExpand && (
           <button
             type="button"
-            aria-label={`Expand ${dotName} computer`}
+            aria-label={t('Expand {name} computer', { name: dotName })}
             onClick={onExpand}
           >
             <ArrowUpRight size={16} />
@@ -170,7 +174,7 @@ export function ComputerToolCard({
       {error && <p role="alert">{error}</p>}
       {interruption && <p role="status">{interruption}</p>}
       {action === 'exec' && complete && typeof data.stdout === 'string' && (
-        <pre aria-label="Computer terminal output">
+        <pre aria-label={t('Computer terminal output')}>
           {data.stdout.slice(0, 4000)}
         </pre>
       )}
@@ -182,18 +186,20 @@ export function ComputerToolCard({
         <div className="inline-computer-preview">
           <div className="inline-computer-caption">
             <span className="live-indicator" />
-            {dotName}’s computer · Current browser view
+            {t('{name}’s computer · Current browser view', { name: dotName })}
           </div>
           {screen && (
             <img
               src={`data:image/png;base64,${screen.base64}`}
-              alt={`Current browser view from ${dotName}'s computer`}
+              alt={t('Current browser view from {name}’s computer', {
+                name: dotName,
+              })}
             />
           )}
           {screenError ? (
             <p role="status">{screenError}</p>
           ) : (
-            !screen && <p role="status">Connecting to computer…</p>
+            !screen && <p role="status">{t('Connecting to computer…')}</p>
           )}
           {screen && <div className="inline-computer-url">{screen.url}</div>}
         </div>

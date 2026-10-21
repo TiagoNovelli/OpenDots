@@ -2,6 +2,7 @@ import { useEffect, useState, type KeyboardEvent } from 'react';
 import { PlugZap, RefreshCw, Trash2 } from 'lucide-react';
 import type { Connection } from '../shared/connection-types';
 import { api } from './api';
+import { t } from './i18n';
 // Lives inside the Dot form, so it saves immediately through its own
 // requests and keeps Enter from submitting the surrounding form.
 const stayInSection = (event: KeyboardEvent) => {
@@ -23,8 +24,8 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
           active &&
           setError(
             cause instanceof Error
-              ? cause.message
-              : 'Could not load connections.',
+              ? t(cause.message)
+              : t('Could not load connections.'),
           ),
       );
     return () => {
@@ -66,11 +67,11 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
   };
   return (
     <fieldset className="space-access-fields connections-fields">
-      <legend>Connections</legend>
+      <legend>{t('Connections')}</legend>
       <p className="muted">
-        Give this Dot tools from MCP servers. Read-only tools run on their own;
-        anything else asks you in chat before it runs. Tokens stay on the
-        server.
+        {t(
+          'Give this Dot tools from MCP servers. Read-only tools run on their own; anything else asks you in chat before it runs. Tokens stay on the server.',
+        )}
       </p>
       {connections?.map((connection) => (
         <div className="connection" key={connection.id}>
@@ -86,7 +87,7 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
             <button
               type="button"
               className="icon-button"
-              aria-label={`Refresh ${connection.name} tools`}
+              aria-label={t('Refresh {name} tools', { name: connection.name })}
               disabled={!!busy}
               onClick={async () => {
                 const next = await run(connection.id, () =>
@@ -104,7 +105,7 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
             <button
               type="button"
               className="icon-button"
-              aria-label={`Remove ${connection.name}`}
+              aria-label={t('Remove {name}', { name: connection.name })}
               disabled={!!busy}
               onClick={async () => {
                 if (!window.confirm(`Remove ${connection.name} from this Dot?`))
@@ -127,7 +128,7 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
             </p>
           )}
           {!connection.tools.length && (
-            <p className="muted">This server offers no tools.</p>
+            <p className="muted">{t('This server offers no tools.')}</p>
           )}
           <ul className="connection-tools">
             {connection.tools.map((tool) => {
@@ -172,7 +173,7 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
                         void patch({ requiresApproval: event.target.checked })
                       }
                     />
-                    Ask first
+                    {t('Ask first')}
                   </label>
                 </li>
               );
@@ -182,18 +183,18 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
       ))}
       <div className="connection-add">
         <label className="field-label" htmlFor="connection-name">
-          Add an MCP server
+          {t('Add an MCP server')}
         </label>
         <input
           id="connection-name"
-          placeholder="Name, e.g. GitHub"
+          placeholder={t('Name, e.g. GitHub')}
           maxLength={40}
           value={name}
           onKeyDown={stayInSection}
           onChange={(event) => setName(event.target.value)}
         />
         <input
-          aria-label="MCP server URL"
+          aria-label={t('MCP server URL')}
           placeholder="https://example.com/mcp"
           type="url"
           value={url}
@@ -201,8 +202,8 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
           onChange={(event) => setUrl(event.target.value)}
         />
         <input
-          aria-label="Bearer token (optional)"
-          placeholder="Bearer token (optional)"
+          aria-label={t('Bearer token (optional)')}
+          placeholder={t('Bearer token (optional)')}
           type="password"
           autoComplete="off"
           value={token}
@@ -215,7 +216,7 @@ export function ConnectionsSection({ dotId }: { dotId: string }) {
           disabled={!!busy || !name.trim() || !url.trim()}
           onClick={() => void add()}
         >
-          {busy === 'add' ? 'Connecting…' : 'Connect'}
+          {busy === 'add' ? t('Connecting…') : t('Connect')}
         </button>
       </div>
       {error && (

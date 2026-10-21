@@ -3,6 +3,7 @@ import { ChevronRight, FileText, Folder } from 'lucide-react';
 import type { Space } from '../shared/types';
 import type { Page } from '../server/pages';
 import { api } from './api';
+import { t } from './i18n';
 
 export function SpaceNav({
   space,
@@ -29,7 +30,7 @@ export function SpaceNav({
           setError('');
         }
       } catch {
-        if (current) setError('Could not load pages.');
+        if (current) setError(t('Could not load pages.'));
       }
     };
     void load();
@@ -90,7 +91,7 @@ export function SpaceNav({
             branches(null)
           )}
           {!error && !pages.length && (
-            <p className="sidebar-empty">No pages yet</p>
+            <p className="sidebar-empty">{t('No pages yet')}</p>
           )}
         </div>
       )}
