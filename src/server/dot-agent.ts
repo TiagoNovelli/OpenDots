@@ -19,6 +19,7 @@ import {
 import { chat, maxIterations } from '@tanstack/ai';
 import { openaiCompatibleText } from '@tanstack/ai-openai/compatible';
 import { compatibleFetch } from './compatible-fetch.js';
+import { modelProvider } from './model-provider.js';
 import { learnedSkillTools, tanstackTools } from './tanstack-tools.js';
 import { Observable } from 'rxjs';
 import { z } from 'zod';
@@ -335,7 +336,9 @@ export class DotAgent extends AbstractAgent {
           baseURL: this.config.baseUrl ?? 'https://api.openai.com/v1',
           api: 'chat-completions',
           maxRetries: 1,
-          fetch: compatibleFetch,
+          ...(modelProvider(this.config.modelProvider).omitEmptyToolRequired
+            ? { fetch: compatibleFetch }
+            : {}),
         });
         const start = async () => {
           const appTools =

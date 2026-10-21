@@ -1,4 +1,5 @@
 import type { WebConfig } from './parallel.js';
+import type { ModelProviderId } from './model-provider.js';
 import type { SetupStatus } from '../shared/types.js';
 
 // `copilotkit project select` writes the CLI name and deletes the template name.
@@ -53,9 +54,13 @@ export interface PlatformConfig extends WebConfig {
   intelligenceKey?: string;
   intelligenceApiUrl?: string;
   intelligenceWsUrl?: string;
+  modelProvider?: ModelProviderId;
   model?: string;
   apiKey?: string;
   baseUrl: string;
+  /** Variable names shown as missing; default to the OPENAI_* names. */
+  apiKeyLabel?: string;
+  modelLabel?: string;
   agentRunTimeoutMs?: number;
   computerSupervisorUrl?: string;
   computerSupervisorToken?: string;
@@ -81,8 +86,8 @@ export function setupStatus(
 ): SetupStatus {
   const missing = [
     !config.intelligenceKey && INTELLIGENCE_KEY_MISSING_LABEL,
-    !config.apiKey && 'OPENAI_API_KEY',
-    !config.model && 'OPENAI_MODEL',
+    !config.apiKey && (config.apiKeyLabel ?? 'OPENAI_API_KEY'),
+    !config.model && (config.modelLabel ?? 'OPENAI_MODEL'),
   ].filter((item): item is string => !!item);
   const declaredSlack = !!(
     config.slackChannel &&

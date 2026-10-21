@@ -72,8 +72,9 @@ Edit `.env` on the server and restart after changes:
 | `INTELLIGENCE_API_KEY`                               | Project credential for conversation persistence                        |
 | `INTELLIGENCE_API_URL`                               | API endpoint override for your Intelligence deployment                 |
 | `INTELLIGENCE_GATEWAY_WS_URL`, `INTELLIGENCE_WS_URL` | Gateway WebSocket override (CLI name preferred; legacy name supported) |
-| `OPENAI_API_KEY`, `OPENAI_MODEL`                     | Model credential and model identifier                                  |
-| `OPENAI_BASE_URL`                                    | Compatible model API endpoint                                          |
+| `MODEL_PROVIDER`, `MODEL_NAME`, `MODEL_BASE_URL`     | Model preset, model identifier and endpoint override; see below        |
+| `OPENAI_API_KEY`, `OPENAI_MODEL`                     | Model credential and model identifier without a preset                 |
+| `OPENAI_BASE_URL`                                    | Compatible model API endpoint without a preset                         |
 | `OWNER_ID`                                           | Stable identity used for this deployment's conversations               |
 | `DATABASE_PATH`                                      | SQLite file containing pages, workspace and work metadata              |
 | `OWNER_TOKEN`                                        | Application access token; required for external bindings               |
@@ -83,7 +84,27 @@ Edit `.env` on the server and restart after changes:
 
 A non-empty `INTELLIGENCE_GATEWAY_WS_URL` takes precedence over `INTELLIGENCE_WS_URL`. Without either WebSocket override, OpenDots uses the hosted gateway. Set both the API and gateway endpoints when connecting a self-hosted deployment.
 
-The model environment variable names follow the configured provider adapter. Provider credentials belong in `.env`, not client-side variables or source code. Conversation history lives in the configured Intelligence project; copying the SQLite file alone does not back up that history.
+Provider credentials belong in `.env`, not client-side variables or source code. Conversation history lives in the configured Intelligence project; copying the SQLite file alone does not back up that history.
+
+### Model providers
+
+Every provider is reached through its OpenAI-compatible Chat Completions API. Set `MODEL_PROVIDER` to a preset and its key; the preset supplies the endpoint, and `MODEL_NAME` the model (optional where a default is listed). `MODEL_BASE_URL` overrides the endpoint, for example for a gateway or another host.
+
+| `MODEL_PROVIDER` | Key variable         | Default model         |
+| ---------------- | -------------------- | --------------------- |
+| `openai`         | `OPENAI_API_KEY`     |                       |
+| `groq`           | `GROQ_API_KEY`       | `openai/gpt-oss-120b` |
+| `anthropic`      | `ANTHROPIC_API_KEY`  | `claude-sonnet-5-5`   |
+| `gemini`         | `GEMINI_API_KEY`     |                       |
+| `openrouter`     | `OPENROUTER_API_KEY` |                       |
+| `deepseek`       | `DEEPSEEK_API_KEY`   |                       |
+| `mistral`        | `MISTRAL_API_KEY`    |                       |
+| `xai`            | `XAI_API_KEY`        |                       |
+| `ollama`         | none (local server)  |                       |
+
+`OPENAI_API_KEY` is the fallback key for every preset. Without `MODEL_PROVIDER`, the `OPENAI_*` variables behave as before, and a base URL that matches a preset's host still gets that preset's request adjustments. Groq rejects strict tool schemas for tools without parameters, so the `groq` preset removes their empty `required` list before sending. OpenAI is the template's original provider and Groq has been verified with live tool calls; the other presets follow each provider's documented compatible endpoint and have not been verified here.
+
+Voice uses its own `VOICE_*` settings and is not affected by the model preset.
 
 ## Pages and page conversations
 
