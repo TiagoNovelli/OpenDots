@@ -1,0 +1,50 @@
+name: Deploy
+# Deploys main to the VPS once CI passes on a push, or on demand.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    # Only CI runs from a push to this repository's main, never pull requests.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://dot.brainess.com.br
+    env:
+      # The server's own key, so the job refuses to talk to anything else.
+      HOST_KEY: 191.252.100.229 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINcpcyV3WeqStXwoRvH35pttaGEPb7qK/FOhajfNjgtL
+    steps:
+      - name: Run the deploy on the VPS
+        env:
+          DEPLOY_KEY: ${{ secrets.OPENDOTS_DEPLOY_KEY }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "::error::Add the OPENDOTS_DEPLOY_KEY secret first."
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$HOST_KEY" > ~/.ssh/known_hosts
+          # authorized_keys pins this key to /usr/local/bin/opendots-deploy.
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes root@191.252.100.229
+      - name: Check the public URL
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' https://dot.brainess.com.br/api/state)
+          echo "https://dot.brainess.com.br/api/state -> $code"
+          [ "$code" = 401 ]
