@@ -1,7 +1,7 @@
 import { openPageLink } from './page-navigation';
 import { SpaceNav } from './SpaceNav';
 import { SpaceWorkspace } from './SpaceWorkspace';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { CopilotKitProvider } from '@copilotkit/react-core/v2';
 import {
   ArrowUp,
@@ -131,6 +131,14 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [search, setSearch] = useState('');
   const [taskDetail, setTaskDetail] = useState<Detail>();
+  // The provider reconnects whenever the headers object changes, so keep it
+  // stable across renders and change it only when the token does.
+  const authorization = authHeaders().Authorization;
+  const runtimeHeaders = useMemo(
+    (): Record<string, string> =>
+      authorization ? { Authorization: authorization } : {},
+    [authorization],
+  );
   const refresh = useCallback(async () => {
     try {
       const [s, w] = await Promise.all([
@@ -956,7 +964,7 @@ export function App() {
     </div>
   );
   return configured ? (
-    <CopilotKitProvider runtimeUrl="/api/copilotkit" headers={authHeaders()}>
+    <CopilotKitProvider runtimeUrl="/api/copilotkit" headers={runtimeHeaders}>
       {content}
     </CopilotKitProvider>
   ) : (
