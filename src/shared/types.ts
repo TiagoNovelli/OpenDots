@@ -68,6 +68,22 @@ export interface State {
   memories: Memory[];
   mode: 'sample' | 'live';
   configured: boolean;
+  /** Latest rate limits reported by the model provider, if it sends them. */
+  modelLimits?: ModelLimits | null;
+}
+export interface ModelLimitWindow {
+  limit: number;
+  remaining: number;
+  resetAt?: number;
+}
+export interface ModelLimits {
+  /** Provider label, such as Groq. */
+  provider: string;
+  updatedAt: number;
+  requests?: ModelLimitWindow;
+  tokens?: ModelLimitWindow;
+  /** Set while the provider is refusing requests for the rate limit. */
+  limitedUntil?: number;
 }
 export type Action = 'run' | 'pause' | 'cancel';
 export interface Space {

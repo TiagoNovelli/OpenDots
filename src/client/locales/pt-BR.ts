@@ -532,4 +532,15 @@ export const ptBR: Record<string, string> = {
   '{name}’s computer · Current browser view':
     'Computador de {name} · Navegador agora',
   '{seconds}s · Call ended': '{seconds}s · Chamada encerrada',
+  'The model’s usage limit was reached. Try again in {seconds}s.':
+    'O limite de uso do modelo foi atingido. Tente de novo em {seconds}s.',
+  '{remaining} of {limit} requests left':
+    '{remaining} de {limit} requisições restantes',
+  '{remaining} of {limit} tokens left':
+    '{remaining} de {limit} tokens restantes',
+  '{provider} usage limit reached. Conversations resume in about {seconds}s.':
+    'Limite de uso da {provider} atingido. As conversas voltam em cerca de {seconds}s.',
+  'Model limits ({provider}):': 'Limites do modelo ({provider}):',
+  'Reported by the provider with each response; updated after the next message.':
+    'Informado pelo provedor a cada resposta; atualiza depois da próxima mensagem.',
 };

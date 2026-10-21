@@ -18,7 +18,7 @@ import {
 } from '@copilotkit/runtime/v2';
 import { chat, maxIterations } from '@tanstack/ai';
 import { openaiCompatibleText } from '@tanstack/ai-openai/compatible';
-import { compatibleFetch } from './compatible-fetch.js';
+import { modelFetch } from './model-limits.js';
 import { modelProvider } from './model-provider.js';
 import { learnedSkillTools, tanstackTools } from './tanstack-tools.js';
 import { Observable } from 'rxjs';
@@ -336,9 +336,10 @@ export class DotAgent extends AbstractAgent {
           baseURL: this.config.baseUrl ?? 'https://api.openai.com/v1',
           api: 'chat-completions',
           maxRetries: 1,
-          ...(modelProvider(this.config.modelProvider).omitEmptyToolRequired
-            ? { fetch: compatibleFetch }
-            : {}),
+          fetch: modelFetch(this.config.modelLimits, {
+            omitEmptyToolRequired: modelProvider(this.config.modelProvider)
+              .omitEmptyToolRequired,
+          }),
         });
         const start = async () => {
           const appTools =

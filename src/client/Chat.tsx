@@ -38,6 +38,7 @@ import { useVoice } from './useVoice';
 import { CallView } from './CallView';
 import { shouldSubmitComposerOnKeyDown } from './chat-composer';
 import { t } from './i18n';
+import { friendlyError } from './model-limit';
 
 export function Chat({
   thread,
@@ -395,7 +396,7 @@ export function Chat({
       )}
       {(chatError || voice.error) && (
         <div className="chat-error" role="alert">
-          {chatError || voice.error}
+          {friendlyError(chatError || voice.error)}
           {chatError && (
             <button
               onClick={() => {

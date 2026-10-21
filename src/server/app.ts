@@ -105,6 +105,7 @@ export function createApp({
       memories: store.memories(),
       mode: config.mode,
       configured: configured(config),
+      modelLimits: config.modelLimits?.snapshot() ?? null,
     }),
   );
   app.post('/api/tasks', async (c) => {

@@ -14,6 +14,7 @@ import {
   t,
   type LocalePreference,
 } from './i18n';
+import { limitSummary } from './model-limit';
 export type Dialog =
   | { type: 'space' }
   | { type: 'dot'; dot?: Dot; spaceId: string }
@@ -499,6 +500,17 @@ export function WorkspaceDialog({
           {dialog.type === 'settings' && (
             <div className="config-note">
               <strong>{t('Service setup')}</strong>
+              {state.modelLimits && (
+                <p>
+                  {t('Model limits ({provider}):', {
+                    provider: state.modelLimits.provider,
+                  })}{' '}
+                  {limitSummary(state.modelLimits).join(' · ')}.{' '}
+                  {t(
+                    'Reported by the provider with each response; updated after the next message.',
+                  )}
+                </p>
+              )}
               <p>
                 {workspace.setup.missing.length ? (
                   <>

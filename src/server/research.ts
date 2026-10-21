@@ -1,11 +1,13 @@
 import { parallelSources, type WebConfig, type WebSource } from './parallel.js';
 import { z } from 'zod';
+import { modelFetch, type ModelLimitTracker } from './model-limits.js';
 import type { Memory, Result } from '../shared/types.js';
 export interface Config extends WebConfig {
   mode: 'sample' | 'live';
   apiKey?: string;
   baseUrl: string;
   model?: string;
+  modelLimits?: ModelLimitTracker;
   browserUrl?: string;
   browserSecret?: string;
 }
@@ -146,7 +148,7 @@ export async function research(
   }
   progress('Sources captured. Writing a brief grounded in the evidence.');
   signal.throwIfAborted();
-  const completion = await fetch(
+  const completion = await modelFetch(config.modelLimits)(
     `${config.baseUrl.replace(/\/$/, '')}/chat/completions`,
     {
       method: 'POST',

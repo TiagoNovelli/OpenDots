@@ -1,5 +1,6 @@
 import type { WebConfig } from './parallel.js';
 import type { ModelProviderId } from './model-provider.js';
+import type { ModelLimitTracker } from './model-limits.js';
 import type { SetupStatus } from '../shared/types.js';
 
 // `copilotkit project select` writes the CLI name and deletes the template name.
@@ -61,6 +62,8 @@ export interface PlatformConfig extends WebConfig {
   /** Variable names shown as missing; default to the OPENAI_* names. */
   apiKeyLabel?: string;
   modelLabel?: string;
+  /** Records the provider's rate-limit headers for the state endpoint. */
+  modelLimits?: ModelLimitTracker;
   agentRunTimeoutMs?: number;
   computerSupervisorUrl?: string;
   computerSupervisorToken?: string;

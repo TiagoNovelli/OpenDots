@@ -1,5 +1,6 @@
 import { webSearchProvider } from './parallel.js';
-import { modelConfigFromEnv } from './model-provider.js';
+import { modelConfigFromEnv, modelProvider } from './model-provider.js';
+import { ModelLimitTracker } from './model-limits.js';
 import { createShutdown } from './shutdown.js';
 import { reportChannelFailure, safeFailure } from './slack-channel.js';
 import { serve } from '@hono/node-server';
@@ -32,11 +33,13 @@ const workspace = new WorkspaceStore(
   database,
   process.env.OWNER_ID ?? 'opendots-owner',
 );
+const model = modelConfigFromEnv(process.env);
 const config: PlatformConfig = {
   intelligenceKey: intelligenceApiKeyFromEnv(process.env),
   intelligenceApiUrl: process.env.INTELLIGENCE_API_URL || undefined,
   intelligenceWsUrl: intelligenceWsUrlFromEnv(process.env),
-  ...modelConfigFromEnv(process.env),
+  ...model,
+  modelLimits: new ModelLimitTracker(modelProvider(model.modelProvider).label),
   agentRunTimeoutMs: agentRunTimeoutMsFromEnv(process.env),
   webSearchProvider: webSearchProvider(process.env.WEB_SEARCH_PROVIDER),
   parallelApiKey: process.env.PARALLEL_API_KEY,
@@ -66,6 +69,7 @@ const researchConfig = {
   apiKey: config.apiKey,
   model: config.model,
   baseUrl: config.baseUrl,
+  modelLimits: config.modelLimits,
   webSearchProvider: config.webSearchProvider,
   parallelApiKey: config.parallelApiKey,
   browserUrl: config.browserUrl,

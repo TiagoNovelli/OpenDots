@@ -49,6 +49,7 @@ import { TaskActions } from './TaskActions';
 import { WorkspaceDialog, type Dialog } from './WorkspaceDialog';
 import { submitComposerOnEnter } from './chat-composer';
 import { t } from './i18n';
+import { friendlyError, secondsUntil } from './model-limit';
 
 function describeFailure(error: unknown, fallback: string) {
   return {
@@ -601,7 +602,7 @@ export function App() {
         </header>
         {error && (
           <div className="error-banner" role="alert">
-            <span>{t(error)}</span>
+            <span>{friendlyError(error)}</span>
             <button
               className="icon-button"
               aria-label={t('Dismiss error')}
@@ -611,6 +612,18 @@ export function App() {
             </button>
           </div>
         )}
+        {!!state.modelLimits?.limitedUntil &&
+          state.modelLimits.limitedUntil > Date.now() && (
+            <div className="notice">
+              {t(
+                '{provider} usage limit reached. Conversations resume in about {seconds}s.',
+                {
+                  provider: state.modelLimits.provider,
+                  seconds: secondsUntil(state.modelLimits.limitedUntil),
+                },
+              )}
+            </div>
+          )}
         {state.settings.paused && (
           <div className="notice">
             {t(
